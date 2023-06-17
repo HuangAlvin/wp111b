@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>五乘五圈圈叉叉</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <style>
+    /* CSS樣式 */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin: 0;
+      padding: 0;
+    }
+    
+    h1 {
+      color: #fff;
+      font-size: 28px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #board {
+      width: 400px;
+      height: 400px;
+      border: 2px solid #000;
+      display: flex;
+      flex-wrap: wrap;
+      background-color: #FFCE9E;
+    }
+
+    .cell {
+      width: 20%;
+      height: 20%;
+      box-sizing: border-box;
+      border: 1px solid #000;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      font-weight: bold;
+      background-color: #F6D2A4;
+    }
+
+    .cell:hover {
+      background-color: #F8E7C2;
+    }
+
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h1>五乘五圈圈叉叉</h1>
+      <div id="board"></div>
+      <button onclick="resetGame()">重新開始</button>
+    </div>
+  </div>
+
+  <script>
+    // 玩家1使用'X'，玩家2使用'O'
+    let currentPlayer = 'X';
+    let gameEnded = false;
+    let moves = 0;
+
+    // 棋盤狀態
+    const board = [
+      ['', '', '', '', ''],
+      ['', '', '', '', ''],
+      ['', '', '', '', ''],
+      ['', '', '', '', ''],
+      ['', '', '', '', '']
+    ];
+
+    // 獲取棋盤元素
+    const boardElement = document.getElementById('board');
+
+    // 初始化棋盤
+    function initBoard() {
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 5; col++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          cell.addEventListener('click', handleCellClick);
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+
+    // 處理單元格點擊事件
+    function handleCellClick(event) {
+      if (gameEnded) return;
+
+      const row = Number(event.target.dataset.row);
+      const col = Number(event.target.dataset.col);
+
+      // 檢查是否已經有棋子
+      if (board[row][col] !== '') return;
+
+      // 更新棋盤狀態
+      board[row][col] = currentPlayer;
+
+      // 更新棋盤顯示
+      event.target.textContent = currentPlayer;
+
+      // 檢查是否有玩家獲勝
+      if (checkWin(row, col)) {
+        alert('玩家 ' + currentPlayer + ' 獲勝！');
+        gameEnded = true;
+        return;
+      }
+
+      // 檢查是否平手
+      moves++;
+      if (moves === 25) {
+        alert('平手！');
+        gameEnded = true;
+        return;
+      }
+
+      // 切換玩家
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    // 檢查是否有玩家獲勝
+    function checkWin(row, col) {
+      const directions = [
+        [0, 1], [1, 0], [1, 1], [1, -1] // 水平、垂直、斜向
+      ];
+
+      for (let i = 0; i < directions.length; i++) {
+        const [dx, dy] = directions[i];
+        let count = 1;
+
+        // 向前檢查
+        let r = row + dx;
+        let c = col + dy;
+        while (r >= 0 && r < 5 && c >= 0 && c < 5 && board[r][c] === currentPlayer) {
+          count++;
+          r += dx;
+          c += dy;
+        }
+
+        // 向後檢查
+        r = row - dx;
+        c = col - dy;
+        while (r >= 0 && r < 5 && c >= 0 && c < 5 && board[r][c] === currentPlayer) {
+          count++;
+          r -= dx;
+          c -= dy;
+        }
+
+        // 如果有五個棋子連線，則獲勝
+        if (count >= 5) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // 初始化遊戲
+    function initGame() {
+      initBoard();
+    }
+
+    // 重新開始遊戲
+    function resetGame() {
+      currentPlayer = 'X';
+      gameEnded = false;
+      moves = 0;
+      boardElement.innerHTML = '';
+      board.forEach(row => row.fill(''));
+      initBoard();
+    }
+
+    // 開始遊戲
+    initGame();
+  </script>
+</body>
+</html>
